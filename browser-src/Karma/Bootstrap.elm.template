@@ -1,0 +1,15 @@
+module Bootstrap exposing (..)
+
+import String
+import Test exposing (..)
+import Karma.Service
+
+{{#suites}}
+import {{module}}
+{{/suites}}
+
+
+main : Karma.Service.KarmaProgram
+main = [ {{tests}} ]
+        |> concat
+        |> Karma.Service.run

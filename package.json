@@ -1,0 +1,44 @@
+{
+  "name": "karma-elm-test",
+  "version": "0.0.1",
+  "description":"Elm plugin for Karma to enable running tests written in elm-test",
+  "keywords": [
+    "karma",
+    "karma-plugin",
+    "karma-framework",
+    "elm",
+    "elm-test"
+  ],
+  "author":"Stephen Hand <steve2727@hotmail.com>",
+  "main":"./node-src/index.js",
+  "homepage": "https://github.com/stephenhand/karma-elm-test",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stephenhand/karma-elm-test.git"
+  },
+  "bugs": {
+    "url": "https://github.com/stephenhand/karma-elm-test/issues"
+  },
+  "dependencies":{
+    "minimist": "1.2.0",
+    "underscore": "1.8.3",
+    "mustache": "2.3.0",
+    "node-elm-compiler": "4.3.2"
+  },
+  "files":[
+    "node-src/index.js",
+    "browser-src/adapter.js",
+    "browser-src/Karma/**/*.elm",
+    "browser-src/Karma/**/*.template"
+  ],
+  "devDependencies": {
+    "karma": "~1.7.0",
+    "karma-mocha": "~1.3.0",
+    "karma-chrome-launcher": "~2.1.1",
+    "karma-firefox-launcher": "~1.0.1"
+  },
+  "peerDependencies":{
+    "karma":">=1.7.0"
+  }
+
+}
