@@ -19,8 +19,10 @@ Missing Functionality (required prior to publishing to NPM)
 
 * Evaluate whether the current approach of basing the elm-package.json for the tests on that of the main project is going to work / be robust
 
-* Testing on Linux
+* Testing on different host OS's
 
 * Testing against a wider variety of test suites
 
-* Testing with different reporters
+* Testing with different reporter pluginss
+
+* Write some instructions
