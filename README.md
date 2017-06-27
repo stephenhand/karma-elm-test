@@ -15,7 +15,7 @@ Missing Functionality (required prior to publishing to NPM)
 
 * Correctly recognising & reporting skipped tests
 
-* Fix issues with current
+* Fix issues with current total test count
 
 * Evaluate whether the current approach of basing the elm-package.json for the tests on that of the main project is going to work / be robust
 
