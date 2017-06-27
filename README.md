@@ -11,8 +11,6 @@ The elm functionality for hosting the test code in a browser was originated from
 Missing Functionality (required prior to publishing to NPM)
 ------------
 
-* Add config option to specify source roots for test suites
-
 * Autowatch functionality (currently only runs once)
 
 * Correctly recognising & reporting skipped tests

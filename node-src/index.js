@@ -33,6 +33,7 @@ let initElmTest = function(files, config){
 
     //Generate elm-package.json to build the tests
     let base = JSON.parse(fs.readFileSync(elmConfig["base-elm-package-config"] || "./elm-package.json", "utf8"));
+
     //Add dependencies used by tests if they aren't there already
     base.dependencies=Object.assign({
         "elm-community/elm-test": "4.1.0 <= v <= 5.0.0",
@@ -41,18 +42,24 @@ let initElmTest = function(files, config){
         "elm-lang/html": "2.0.0 <= v < 3.0.0",
         "mgold/elm-random-pcg": "4.0.2 <= v < 6.0.0",
     },base.dependencies);
+
+    //add required paths to source directories
     let srcDirs = base["source-directories"];
     if (typeof srcDirs === "string"){
         srcDirs = [srcDirs];
     }
+    srcDirs=srcDirs.concat(elmConfig["test-source-directories"] || []);
     srcDirs=_.map(srcDirs, p=>path.resolve(p));
     srcDirs.push(path.join(__dirname, "../browser-src/"));
     base["source-directories"] =srcDirs;
+
+    //write modified elm-package.json for private use in plugin
     fs.writeFileSync(
         path.join(__dirname, "../browser-src/elm-package.json"), JSON.stringify(base), "utf8"
     );
+
+    //install the packages and compile the elm using external dependencies
     let compileCmd = "elm-make " + path.join("Karma", "Bootstrap.elm") + " --output=allTheTests.js";
-    //install the packages and compile the elm
     console.log(JSON.stringify(exec.execSync("elm-package install", {cwd:path.join(__dirname, "../browser-src"), stdio:'inherit'})));
     exec.execSync(compileCmd, {cwd:path.join(__dirname, "../browser-src")});
 
