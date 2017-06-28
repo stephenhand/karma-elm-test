@@ -11,8 +11,6 @@ The elm functionality for hosting the test code in a browser was originated from
 Missing Functionality (required prior to publishing to NPM)
 ------------
 
-* Autowatch functionality (currently only runs once)
-
 * Correctly recognising & reporting skipped tests
 
 * Fix issues with current total test count
@@ -23,6 +21,6 @@ Missing Functionality (required prior to publishing to NPM)
 
 * Testing against a wider variety of test suites
 
-* Testing with different reporter pluginss
+* Testing with different reporter plugins
 
 * Write some instructions

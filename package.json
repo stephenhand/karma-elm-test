@@ -26,8 +26,8 @@
     "node-elm-compiler": "4.3.2"
   },
   "files":[
-    "node-src/index.js",
-    "browser-src/adapter.js",
+    "node-src/*.js",
+    "browser-src/*.js",
     "browser-src/Karma/**/*.elm",
     "browser-src/Karma/**/*.template"
   ],

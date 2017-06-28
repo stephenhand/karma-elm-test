@@ -1,35 +1,18 @@
-let path = require("path");
-let fs = require("fs");
-let _ = require("underscore");
-let mustache = require("mustache");
+const path = require("path");
+const fs = require("fs");
+const _ = require("underscore");
+const mustache = require("mustache");
 const exec = require("child_process");
+const preprocessorFactory = require("./elm-preprocessor");
+
 
 
 let createPattern = function (path) {
-    return {pattern: path, included: true, served: true, watched: false}
+    return {pattern: path, included: true, served: true, watched: true}
 };
-let initElmTest = function(files, config){
-    console.log("initElmTest: files: "+JSON.stringify(files));
-    config = config || {};
-    config.client = config.client || {};
-    let elmConfig = config.client["elm-test"] || {};
-
-    //Generate elm start page that executes tests
-    let template = fs.readFileSync(path.join(__dirname, "../browser-src/Karma/Bootstrap.elm.template"), "utf8");
-
-    let suitesConfig ={
-        suites: elmConfig.suites,
-        tests:_.chain(elmConfig.suites)
-                .pluck("tests")
-                .flatten()
-                .values()
-                .join(",\r\n    ")
-    };
-
-    fs.writeFileSync(path.join(__dirname, "../browser-src/Karma/Bootstrap.elm"), mustache.render(
-        template,
-        suitesConfig
-    ), "utf8");
+let initElmTest = function(files, clientConfig, logger){
+    const log = logger.create("preprocessor.elm");
+    let elmConfig = (clientConfig || {})["elm-test"];
 
     //Generate elm-package.json to build the tests
     let base = JSON.parse(fs.readFileSync(elmConfig["base-elm-package-config"] || "./elm-package.json", "utf8"));
@@ -57,18 +40,22 @@ let initElmTest = function(files, config){
     fs.writeFileSync(
         path.join(__dirname, "../browser-src/elm-package.json"), JSON.stringify(base), "utf8"
     );
+    exec.execSync("elm-package install", {cwd:path.join(__dirname, "../browser-src"), stdio:'inherit'});
 
-    //install the packages and compile the elm using external dependencies
-    let compileCmd = "elm-make " + path.join("Karma", "Bootstrap.elm") + " --output=allTheTests.js";
-    console.log(JSON.stringify(exec.execSync("elm-package install", {cwd:path.join(__dirname, "../browser-src"), stdio:'inherit'})));
-    exec.execSync(compileCmd, {cwd:path.join(__dirname, "../browser-src")});
+    //compile initial version (doing it via preprocessor after startup creates a race condition
+    try {
+        preprocessorFactory.compile(elmConfig);
+    } catch (err){
+        log.error(err);
+    }
 
     //Add adapter & compiled js to files
     files.unshift(createPattern(path.join(__dirname, "../browser-src/adapter.js")));
     files.unshift(createPattern(path.join(__dirname, "../browser-src/allTheTests.js")));
 };
-initElmTest.$inject = ['config.files', 'config'];
+initElmTest.$inject = ["config.files", "config.client", "logger"];
 
 module.exports = {
-    "framework:elm-test":["factory", initElmTest]
+    "framework:elm-test":["factory", initElmTest],
+    "preprocessor:elm": ["factory", preprocessorFactory.create]
 };
