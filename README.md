@@ -4,9 +4,7 @@ karma-elm-test
 
 A [Karma](http://karma-runner.github.io) plugin for elm to run tests written using [elm-test](https://github.com/elm-community/elm-test) to provided CI friendly, multi-browser unit testing for Elm.
 
-This plugin is still in development and not at a stage where I'd consider it ready to publish to NPM, although I hope to get it to that stage within the next few weeks.
-
-The elm functionality for hosting the test code in a browser was originated from the elm [html-test-runner](https://github.com/elm-community/html-test-runner)
+The elm functionality for hosting the test code in a browser originated from the elm [html-test-runner](https://github.com/elm-community/html-test-runner).
 
 Prerequisites
 ------------
@@ -99,3 +97,18 @@ Known issues & limitations
 * Current total test count is wrong, usually reports one less than the correct total.
 
 * Only supports projects where a single elm-packages.json for the code under test is in the root directory, more flexibility is required.
+
+Roadmap
+-------------
+
+The following things are on my list for doing ASAP (in approximate priority order:
+
+* Fix above outstanding issues
+
+* Add unit tests ('dog fooding' running in karma via this plugin)
+
+* Add auto discovery of tests to cut down required config
+
+* Investigate ways of more elegantly / robustly compiling & running tests. Generating elm-packages.json and Bootstrap.elm files seems a bit kludgy (nasty unnecessary side effects!) and being able to do a fully in memory approach.
+
+* Try to make the project 'pure node' rather than shelling out to external programs (or have those programs contained within / auto deployed alongside the plugin) to make it easier to deploy in CI.
