@@ -20,7 +20,6 @@ let initElmTest = function(files, clientConfig, logger){
     //Add dependencies used by tests if they aren't there already
     base.dependencies=Object.assign({
         "elm-community/elm-test": "4.1.0 <= v <= 5.0.0",
-        "elm-community/html-test-runner":"1.0.0 <= v < 3.0.0",
         "elm-lang/core": "5.1.1 <= v < 6.0.0",
         "elm-lang/html": "2.0.0 <= v < 3.0.0",
         "mgold/elm-random-pcg": "4.0.2 <= v < 6.0.0",

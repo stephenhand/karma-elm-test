@@ -22,8 +22,7 @@
   "dependencies":{
     "minimist": "1.2.0",
     "underscore": "1.8.3",
-    "mustache": "2.3.0",
-    "node-elm-compiler": "4.3.2"
+    "mustache": "2.3.0"
   },
   "files":[
     "node-src/*.js",
