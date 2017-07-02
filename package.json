@@ -20,7 +20,6 @@
     "url": "https://github.com/stephenhand/karma-elm-test/issues"
   },
   "dependencies":{
-    "minimist": "1.2.0",
     "underscore": "1.8.3",
     "mustache": "2.3.0"
   },
