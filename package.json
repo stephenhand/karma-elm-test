@@ -1,6 +1,6 @@
 {
   "name": "karma-elm-test",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description":"Elm plugin for Karma to enable running tests written in elm-test",
   "keywords": [
     "karma",

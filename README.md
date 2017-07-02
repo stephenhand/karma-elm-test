@@ -62,11 +62,17 @@ Second, all your elm files, production and test need to be specified under 'file
         files: ["./src/**/*.elm", "./tests/**/*.elm"],
 ~~~
 
-Finally, a root client item needs adding with an 'elm-test' item under that, this needs to contain the following:
+Finally, a root 'client' item needs adding with an 'elm-test' item under that, which needs to contain the following:
 
 A 'test-source-directories' array containing the paths to your elm test source. These are relative to the project root and are specified in the same way as source directory paths in your elm-pacages.json.
 
-A 'suites' containing a list of all the modules containing your tests and the fully qualified function calls required to execute them. For example:
+~~~
+    "test-source-directories" : [
+        "./tests"
+    ]
+~~~
+
+A 'suites' array containing a list of all the modules containing your tests and the fully qualified function calls required to execute them. For example:
 
 ~~~
     suites:[
