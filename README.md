@@ -4,7 +4,7 @@ karma-elm-test
 
 A [Karma](http://karma-runner.github.io) plugin for elm to run tests written using [elm-test](https://github.com/elm-community/elm-test) to provided CI friendly, multi-browser unit testing for Elm.
 
-The elm functionality for hosting the test code in a browser originated from the elm [html-test-runner](https://github.com/elm-community/html-test-runner).
+The elm functionality for hosting the test code in a browser is adapted from elm [html-test-runner](https://github.com/elm-community/html-test-runner).
 
 Prerequisites
 ------------
@@ -44,7 +44,7 @@ Configuration
 
 The current version requires pretty verbose config, something I hope to improve in upcoming versions.
 
-I created a branch of elm-css converted to run its tests in karma using this plugin here: https://github.com/stephenhand/elm-css the karma.conf.js included here is a good reference example of how to configure the plugin.
+I created a fork of elm-css converted to run its tests in karma using this plugin here: https://github.com/stephenhand/elm-css the karma.conf.js included here is a good reference example of how to configure the plugin.
 
 Firstly, the plugin needs 'elm-test' to be registered as a framework AND 'elm' to be registered as a preprocessor, so something like:
 
@@ -111,10 +111,12 @@ The following things are on my list for doing ASAP (in approximate priority orde
 
 * Fix above outstanding issues
 
-* Add unit tests ('dog fooding' running in karma via this plugin)
+* Refactor project to depend on a fork of html-test-runner for its Elm browser code so it's easier to merge in changes going forward
+
+* Add unit tests (possibly 'dog fooding', running in karma via this plugin)
 
 * Add auto discovery of tests to cut down required config
 
-* Investigate ways of more elegantly / robustly compiling & running tests. Generating elm-packages.json and Bootstrap.elm files seems a bit kludgy (nasty unnecessary side effects!) and being able to do a fully in memory approach.
+* Investigate ways of more elegantly / robustly compiling & running tests. Generating elm-packages.json and Bootstrap.elm files seems a bit kludgy (nasty unnecessary side effects!), being able do everything in memory would be ideal.
 
 * Try to make the project 'pure node' rather than shelling out to external programs (or have those programs contained within / auto deployed alongside the plugin) to make it easier to deploy in CI.
