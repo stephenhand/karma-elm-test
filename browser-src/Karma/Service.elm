@@ -17,6 +17,7 @@ type alias ExternalTestReport = {
 
     }
 
+--Ports provide hooks to karma
 port sendReport : ExternalTestReport -> Cmd msg
 port acknowledge : (Bool -> msg) -> Sub msg
 
@@ -39,15 +40,20 @@ runWithOptions : Maybe Int -> Maybe Random.Seed -> Test -> KarmaProgram
 runWithOptions runs seed test =
     Html.program
         { init = App.init (Maybe.withDefault 100 runs) seed (\tr -> case tr of
-            Ready testsToRun ->
 
+            --Report total number of tests at start
+            Ready testsToRun ->
                 sendReport {title = "Ready", success = Nothing, runComplete=False, testsToRun = Just testsToRun, infoOnly = Nothing}
+            --Report a pass
             Pass progress ->
                 sendReport {title = progress.lastTest, success = Just True, runComplete=False, testsToRun = Nothing, infoOnly = Nothing}
+            --Report a fail
             Fail progress ->
                 sendReport {title = String.join "\r\n"  [progress.lastTest, progress.failureDescription], success = Just False, runComplete=False, testsToRun = Nothing, infoOnly = Nothing}
+            --Report a skipped test or a todo
             InfoOnly progress ->
                 sendReport {title = String.join "\r\n"  [progress.lastTest, progress.description], success = Nothing, runComplete=False, testsToRun = Nothing, infoOnly = Just True}
+            --Report test run complete
             Done summary ->
                 case summary.failureReason of
                     Just reason ->
