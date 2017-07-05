@@ -7,6 +7,7 @@ module Karma.Exploration
         , Status(..)
         , fromTest
         , step
+        , peek
         )
 
 import Expect
@@ -38,7 +39,7 @@ type Status
         , remaining : Int
         , failures : List Failure
         , next : Runner
-        , lastTest : {
+        , lastTest : Maybe {
                 description:String,
                 result:Result
             }
@@ -86,7 +87,25 @@ fromTest runs seed test =
 
 
 step : Runner -> Status
-step (Runner internals) =
+step runner =
+    statusFromRunner runner (\(Runner internals) next queue ->
+        next.run ()
+            |> fromExpectation { internals | queue = queue } next.labels)
+
+peek : Runner -> Status
+
+peek runner =
+    statusFromRunner runner (\(Runner internals) _ _ ->
+                                Running { passed = internals.passed
+                                     , remaining = List.length internals.queue
+                                     , failures = internals.failures
+                                     , next = Runner internals
+                                     , lastTest = Nothing
+                                    })
+
+
+statusFromRunner:Runner -> (Runner -> Test.Runner.Runner -> List Test.Runner.Runner -> Status) -> Status
+statusFromRunner (Runner internals)  whileRunning =
     case
         ( internals.autoFail
         , internals.todos
@@ -107,9 +126,7 @@ step (Runner internals) =
             Fail internals.passed failures
 
         ( _, _, _, next :: queue ) ->
-            next.run ()
-                |> fromExpectation { internals | queue = queue } next.labels
-
+            whileRunning (Runner internals) next queue
 
 fromExpectation : Internals -> List String -> List Expect.Expectation -> Status
 fromExpectation internals labels expectations =
@@ -162,7 +179,7 @@ toRunning internals labels result =
         , remaining = List.length internals.queue
         , failures = internals.failures
         , next = Runner internals
-        , lastTest = {
+        , lastTest = Just {
             description = labels |> fromLabels,
             result = result
             }

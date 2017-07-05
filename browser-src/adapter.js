@@ -11,7 +11,7 @@
                 karma.info(report.title);
                 app.ports.acknowledge.send(true);
             }
-            else if (report.testsToRun) {
+            else if (typeof(report.testsToRun)==="number") {
                 karma.info({total: report.testsToRun});
                 app.ports.acknowledge.send(true);
             }

@@ -14,7 +14,7 @@ import Expect exposing (Expectation)
 import Random.Pcg as Random
 import Task
 import Test exposing (Test)
-import Karma.Exploration as Runner
+import Karma.Exploration as Runner exposing (Reason(..))
 import Time exposing (Time)
 
 
@@ -46,7 +46,7 @@ dispatch =
 start : Int -> Test -> Random.Seed -> Runner.Status
 start runs test seed =
     Runner.fromTest runs seed test
-        |> Runner.step
+        |> Runner.peek
 
 
 init : Int -> Maybe Random.Seed -> Reporter -> Test -> ( Model, Cmd Msg )
@@ -62,13 +62,17 @@ statusToTestResult : Runner.Status -> TestResult
 statusToTestResult status =
         case status of
             Runner.Running state ->
-                case state.lastTest.result of
-                    Runner.Passed ->
-                        Pass {lastTest = state.lastTest.description, done=state.passed, remaining = state.remaining}
-                    Runner.Failed reasons ->
-                        Fail {lastTest = state.lastTest.description, failureDescription = reasons |> reasonsToDescription}
-                    Runner.NotDone (labels, reasons) ->
-                        InfoOnly {lastTest = state.lastTest.description, description = String.concat ["TODO: ", reasons |> reasonsToDescription] }
+                case state.lastTest of
+                    Just test->
+                         case test.result of
+                             Runner.Passed ->
+                                 Pass {lastTest = test.description, done=state.passed, remaining = state.remaining}
+                             Runner.Failed reasons ->
+                                 Fail {lastTest = test.description, failureDescription = reasons |> reasonsToDescription}
+                             Runner.NotDone (labels, reasons) ->
+                                 InfoOnly {lastTest = test.description, description = String.concat ["TODO: ", reasons |> reasonsToDescription] }
+                    Nothing ->
+                        Ready state.remaining
 
             Runner.Pass passed ->
                 Done {message = "Passed", failureReason = Nothing}
@@ -81,7 +85,12 @@ statusToTestResult status =
                                                               |> List.map toString
                                                               |> String.join "\r\n")}
             Runner.AutoFail _ reason ->
-                Done {message = "AutoFail", failureReason = Just (toString reason)}
+                Done {message = "AutoFail", failureReason = (case reason of
+                    Custom customString ->
+                        Just (toString reason)
+                    _ ->
+                        Nothing
+                        )}
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -93,27 +102,17 @@ update msg model =
                          |> start runs test
                     in
                     ( Started now now (send, acknowledge) status
-                    , case status of
-                        Runner.Running state ->
-                            Ready state.remaining
-                            |> send
-                        _ ->
-                            status
-                              |> statusToTestResult
-                              |> send)
+                    , status
+                          |> statusToTestResult
+                          |> send)
 
                 NotStarted (Just seed) runs (send, acknowledge) test ->
                     let status = start runs test seed
                     in
                     ( Started now now (send, acknowledge) status
-                    , case status of
-                        Runner.Running state ->
-                            Ready state.remaining
-                            |> send
-                        _ ->
-                            status
-                              |> statusToTestResult
-                              |> send)
+                    , status
+                        |> statusToTestResult
+                        |> send)
 
                 Started startTime _ (send, acknowledge) (Runner.Running state) ->
                     ( Started startTime now (send, acknowledge) (Runner.step state.next)
@@ -144,7 +143,11 @@ present model =
         Started startTime now reporter status ->
             case status of
                 Runner.Running state ->
-                    Just (String.concat ["Running: ", state.lastTest.description ])
+                    case state.lastTest of
+                        Nothing ->
+                            Just "Starting.."
+                        Just test ->
+                            Just (String.concat ["Running: ", test.description ])
                 Runner.Pass passed ->
                     Just (String.concat ["Passed:", toString passed ])
                 Runner.Fail _ _ ->
