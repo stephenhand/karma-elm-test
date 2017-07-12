@@ -23,7 +23,7 @@
                 karma.result({
                     id: '',
                     description: report.title,
-                    suite: [],
+                    suite: report.suites,
                     success: report.success,
                     skipped: report.skipped,
                     pending: false,

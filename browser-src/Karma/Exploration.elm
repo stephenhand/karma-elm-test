@@ -39,8 +39,8 @@ type Status
         , remaining : Int
         , failures : List Failure
         , next : Runner
-        , lastTest : Maybe {
-                description:String,
+        , testJustRun : Maybe {
+                descriptions:List String,
                 result:Result
             }
         }
@@ -100,7 +100,7 @@ peek runner =
                                      , remaining = List.length internals.queue
                                      , failures = internals.failures
                                      , next = Runner internals
-                                     , lastTest = Nothing
+                                     , testJustRun = Nothing
                                     })
 
 
@@ -179,8 +179,8 @@ toRunning internals labels result =
         , remaining = List.length internals.queue
         , failures = internals.failures
         , next = Runner internals
-        , lastTest = Just {
-            description = labels |> fromLabels,
+        , testJustRun = Just {
+            descriptions = labels,
             result = result
             }
         }

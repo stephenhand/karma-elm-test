@@ -12,6 +12,7 @@ type alias ExternalTestReport = {
     success:Maybe Bool,
     infoOnly:Maybe Bool,
     title:String,
+    suites:List String,
     runComplete:Bool,
     testsToRun:Maybe Int
 
@@ -43,23 +44,31 @@ runWithOptions runs seed test =
 
             --Report total number of tests at start
             Ready testsToRun ->
-                sendReport {title = "Ready", success = Nothing, runComplete=False, testsToRun = Just testsToRun, infoOnly = Nothing}
+                sendReport {title = "Ready", suites = [], success = Nothing, runComplete=False, testsToRun = Just testsToRun, infoOnly = Nothing}
             --Report a pass
             Pass progress ->
-                sendReport {title = progress.lastTest, success = Just True, runComplete=False, testsToRun = Nothing, infoOnly = Nothing}
+                case progress.testJustRun of
+                    [] ->
+                        sendReport {title = "--UNTITLED TEST--", suites=[], success = Just True, runComplete=False, testsToRun = Nothing, infoOnly = Nothing}
+                    (testTitle::suites) ->
+                        sendReport {title = testTitle, suites=suites |> List.reverse, success = Just True, runComplete=False, testsToRun = Nothing, infoOnly = Nothing}
             --Report a fail
             Fail progress ->
-                sendReport {title = String.join "\r\n"  [progress.lastTest, progress.failureDescription], success = Just False, runComplete=False, testsToRun = Nothing, infoOnly = Nothing}
+                case progress.testJustRun of
+                    [] ->
+                        sendReport {title =  progress.failureDescription, suites=[], success = Just False, runComplete=False, testsToRun = Nothing, infoOnly = Nothing}
+                    (testTitle::suites) ->
+                        sendReport {title = String.join "\r\n"  [testTitle, progress.failureDescription], suites=suites |> List.reverse, success = Just False, runComplete=False, testsToRun = Nothing, infoOnly = Nothing}
             --Report a skipped test or a todo
             InfoOnly progress ->
-                sendReport {title = String.join "\r\n"  [progress.lastTest, progress.description], success = Nothing, runComplete=False, testsToRun = Nothing, infoOnly = Just True}
+                sendReport {title = String.join "\r\n"  (progress.testJustRun ++ [progress.description]), suites = [], success = Nothing, runComplete=False, testsToRun = Nothing, infoOnly = Just True}
             --Report test run complete
             Done summary ->
                 case summary.failureReason of
                     Just reason ->
-                        sendReport {title = String.join "\r\n" [summary.message, reason], success = Just False, runComplete=True, testsToRun = Nothing, infoOnly = Nothing}
+                        sendReport {title = String.join "\r\n" [summary.message, reason], suites = [], success = Just False, runComplete=True, testsToRun = Nothing, infoOnly = Nothing}
                     Nothing ->
-                        sendReport {title = summary.message, success = Just True, runComplete=True, testsToRun = Nothing, infoOnly = Nothing}
+                        sendReport {title = summary.message, suites = [], success = Just True, runComplete=True, testsToRun = Nothing, infoOnly = Nothing}
 
         , acknowledge) test
         , update = App.update

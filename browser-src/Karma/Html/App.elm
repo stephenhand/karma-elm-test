@@ -29,9 +29,9 @@ type Msg
 
 type TestResult
     = Ready Int
-    | Pass {lastTest:String, done:Int, remaining:Int}
-    | Fail {lastTest:String, failureDescription:String}
-    | InfoOnly {lastTest:String, description:String}
+    | Pass {testJustRun:List String, done:Int, remaining:Int}
+    | Fail {testJustRun:List String, failureDescription:String}
+    | InfoOnly {testJustRun:List String, description:String}
     | Done {message:String, failureReason: Maybe String}
 
 type alias Reporter =(TestResult -> Cmd Msg, (Bool -> Msg) -> Sub Msg)
@@ -62,15 +62,15 @@ statusToTestResult : Runner.Status -> TestResult
 statusToTestResult status =
         case status of
             Runner.Running state ->
-                case state.lastTest of
+                case state.testJustRun of
                     Just test->
                          case test.result of
                              Runner.Passed ->
-                                 Pass {lastTest = test.description, done=state.passed, remaining = state.remaining}
+                                 Pass {testJustRun = test.descriptions, done=state.passed, remaining = state.remaining}
                              Runner.Failed reasons ->
-                                 Fail {lastTest = test.description, failureDescription = reasons |> reasonsToDescription}
+                                 Fail {testJustRun = test.descriptions, failureDescription = reasons |> reasonsToDescription}
                              Runner.NotDone (labels, reasons) ->
-                                 InfoOnly {lastTest = test.description, description = String.concat ["TODO: ", reasons |> reasonsToDescription] }
+                                 InfoOnly {testJustRun = test.descriptions, description = String.concat ["TODO: ", reasons |> reasonsToDescription] }
                     Nothing ->
                         Ready state.remaining
 
@@ -143,11 +143,11 @@ present model =
         Started startTime now reporter status ->
             case status of
                 Runner.Running state ->
-                    case state.lastTest of
+                    case state.testJustRun of
                         Nothing ->
                             Just "Starting.."
                         Just test ->
-                            Just (String.concat ["Running: ", test.description ])
+                            Just (String.concat ["Running: ",  test.descriptions |> String.join " >> " ])
                 Runner.Pass passed ->
                     Just (String.concat ["Passed:", toString passed ])
                 Runner.Fail _ _ ->
