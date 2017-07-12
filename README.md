@@ -98,9 +98,7 @@ Specifying all the modules & entry functions in config is obviously less than id
 Known issues & limitations
 ------------
 
-* Doesn't correctly recognise & report skipped tests
-
-* Current total test count is wrong, usually reports one less than the correct total.
+* Doesn't correctly report skipped tests
 
 * Only supports projects where a single elm-packages.json for the code under test is in the root directory, more flexibility is required.
 
