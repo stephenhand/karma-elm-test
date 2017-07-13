@@ -58,6 +58,11 @@ reasonsToDescription reasons = reasons
     |> (List.map (\{message} -> message) )
     |> String.join "\r\n"
 
+failuresToDescription: List Runner.Failure -> String
+failuresToDescription failures = failures
+                            |> List.map toString
+                            |> String.join "\r\n"
+
 statusToTestResult : Runner.Status -> TestResult
 statusToTestResult status =
         case status of
@@ -77,13 +82,9 @@ statusToTestResult status =
             Runner.Pass passed ->
                 Done {message = "Passed", failureReason = Nothing}
             Runner.Fail _ failures ->
-                Done {message = "Failed", failureReason = Just (failures
-                                                            |> List.map toString
-                                                            |> String.join "\r\n")}
+                Done {message = "Failed", failureReason = Just (failures |> failuresToDescription)}
             Runner.Todo _ failures->
-                Done {message = "Todo", failureReason = Just (failures
-                                                              |> List.map toString
-                                                              |> String.join "\r\n")}
+                Done {message = "Todo", failureReason = Just (failures |> failuresToDescription)}
             Runner.AutoFail _ reason ->
                 Done {message = "AutoFail", failureReason = (case reason of
                     Custom customString ->
@@ -150,12 +151,16 @@ present model =
                             Just (String.concat ["Running: ",  test.descriptions |> String.join " >> " ])
                 Runner.Pass passed ->
                     Just (String.concat ["Passed:", toString passed ])
-                Runner.Fail _ _ ->
-                    Just ("Fail")
-                Runner.Todo _ _->
-                    Just ("Todo")
-                Runner.AutoFail _ _ ->
-                    Just ("AutoFail")
+                Runner.Fail _ failures ->
+                    Just (String.concat ["Fail: ", (failures |> failuresToDescription) ])
+                Runner.Todo _ todos->
+                    Just (String.concat ["Todo: ", (todos |> failuresToDescription) ])
+                Runner.AutoFail _ reason ->
+                    case reason of
+                        Skip -> Just "Some tests were skipped"
+                        Only -> Just "Only a subset of tests were run"
+                        Custom message -> Just message
+
 
 subscriptions : Model -> Sub Msg
 

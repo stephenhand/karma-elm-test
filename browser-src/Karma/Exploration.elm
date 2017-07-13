@@ -167,10 +167,6 @@ fromExpectation internals labels expectations =
             }
             labels
             (Failed  failures )
-fromLabels:List String -> String
-fromLabels labels = labels
-                       |> List.reverse
-                       |> String.join " >> "
 
 toRunning : Internals -> List String -> Result -> Status
 toRunning internals labels result =
