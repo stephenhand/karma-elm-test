@@ -21,10 +21,14 @@
   },
   "dependencies":{
     "underscore": "1.8.3",
-    "mustache": "2.3.0"
+    "mustache": "2.3.0",
+    "find-parent-dir": "0.3.0",
+    "binstall": "1.2.0",
+    "xmlbuilder": "8.2.2"
   },
   "files":[
-    "node-src/*.js",
+    "node-src/**/*.js",
+    "installer.js",
     "browser-src/*.js",
     "browser-src/Karma/**/*.elm",
     "browser-src/Karma/**/*.template"

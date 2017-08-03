@@ -98,14 +98,14 @@ Specifying all the modules & entry functions in config is obviously less than id
 Known issues & limitations
 ------------
 
-* Doesn't correctly report skipped tests
+* Doesn't correctly report skipped tests - this information is not currently exposed by the core elm-test test runner
 
 * Only supports projects where a single elm-packages.json for the code under test is in the root directory, more flexibility is required.
 
 Roadmap
 -------------
 
-The following things are on my list for doing ASAP (in approximate priority order:
+The following things are on my list for doing ASAP (in approximate priority order):
 
 * Fix above outstanding issues
 

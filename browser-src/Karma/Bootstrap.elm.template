@@ -7,8 +7,6 @@ import Karma.Service
 {{#suites}}
 import {{module}}
 {{/suites}}
-
-
 main : Karma.Service.KarmaProgram
 main = [ {{tests}} ]
         |> concat

@@ -12,6 +12,9 @@ let createPattern = function (path) {
 };
 let initElmTest = function(files, clientConfig, logger){
     const log = logger.create("preprocessor.elm");
+    files.unshift(createPattern(path.join(__dirname, "../browser-src/adapter.js")));
+    fs.writeFileSync(path.join(__dirname, "../browser-src/allTheTests.js"), "window.Elm={};")
+    files.unshift(createPattern(path.join(__dirname, "../browser-src/allTheTests.js")));
     let elmConfig = (clientConfig || {})["elm-test"];
 
     //Generate elm-package.json to build the tests
@@ -30,10 +33,11 @@ let initElmTest = function(files, clientConfig, logger){
     if (typeof srcDirs === "string"){
         srcDirs = [srcDirs];
     }
-    srcDirs=srcDirs.concat(elmConfig["test-source-directories"] || []);
+    srcDirs=(elmConfig["test-source-directories"] || []).concat(srcDirs);
     srcDirs=_.map(srcDirs, p=>path.resolve(p));
     srcDirs.push(path.join(__dirname, "../browser-src/"));
     base["source-directories"] =srcDirs;
+    base["exposed-modules"] = [];
 
     //write modified elm-package.json for private use in plugin
     fs.writeFileSync(
@@ -43,14 +47,14 @@ let initElmTest = function(files, clientConfig, logger){
 
     //compile initial version (doing it via preprocessor after startup creates a race condition
     try {
-        preprocessorFactory.compile(elmConfig);
+        preprocessorFactory.compile(elmConfig, function(){
+            //
+        });
     } catch (err){
         log.error(err);
     }
 
     //Add adapter & compiled js to files
-    files.unshift(createPattern(path.join(__dirname, "../browser-src/adapter.js")));
-    files.unshift(createPattern(path.join(__dirname, "../browser-src/allTheTests.js")));
 };
 initElmTest.$inject = ["config.files", "config.client", "logger"];
 
